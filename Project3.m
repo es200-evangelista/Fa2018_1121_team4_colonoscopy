@@ -40,15 +40,33 @@ vector.YData = vector.YData+mean(h.YData);
 
 %% Make Lasers
 
-laserx=[20 40];
+laserx=[20 22];
 lasery=[0 0];
-laser = plot(laserx, lasery, 'g');
-laser.UserData.l=20;
+laser = plot(laserx, lasery, 'o');
+laser.UserData.l=2;
 laser.Visible = 'off';
-laser.UserData.v = 2;
+laser.UserData.v = 8;
 laser.UserData.vx = 0;
 laser.UserData.vy = 0;
 laser.UserData.dead=0;
+
+%% Add bad guys
+badguyok = 0;
+i=0;
+    while (i<=10)
+  b = randi(3000,1)
+  c = randi(150,1)
+  hbadguy = fill([b,b,b+20,b+20,b],[c,c+10,c+10,c,c],'g')
+  if (topwallcollision(hbadguy)==1 || bottomwallcollision(hbadguy)==1)
+      disp('bad badguy - make a new one');
+      badguyok = 0;
+      clear hbadguy
+  else 
+      badguyok = 1;
+      i = i+1
+  end 
+    end
+    
 %% Plot Motion
 flushinput(s);
 v=1;
@@ -81,21 +99,26 @@ while(1)
     %% fire laser
     if input == 65527 % bug somewhere in this section
         fprintf('shoot\n');
-        laser.XData = laser.XData + mean(h.XData)
-        laser.YData = laser.YData + mean(h.YData)
+        laser.XData = [20 22] + mean(h.XData)
+        laser.YData = [0 0] + mean(h.YData)
         laser.UserData.vx = laser.UserData.v*cos(vector.UserData.theta)
         laser.UserData.vy = laser.UserData.v*sin(vector.UserData.theta)
         laser.Visible= 'on';
-        while (laser.UserData.dead == 0)
+        laser.UserData.dead = 1;
+    end
+    
+    if (laser.UserData.dead == 1)
             laser.XData = laser.XData + laser.UserData.vx;
             laser.YData = laser.YData + laser.UserData.vy;
-            if mean(laser.XData) > mean(h.XData) + 300;
-                laser.UserData.dead = 1;
+            if mean(laser.XData) > mean(h.XData) + 200
+                laser.UserData.dead = 0;
                 laser.Visible='off';
             end
-            pause(.01);
+            if (bottomwallcollision(laser))==1 || (topwallcollision(laser)==1)
+                laser.UserData.dead = 0;
+            end
         end
-    end
+    
     %% moving object
     if ((input == 63487) && (topwallcollision(h) == 0)) % press up to go up
         h.YData=h.YData+1;
@@ -108,12 +131,12 @@ while(1)
     
     %% moving object if colliding with wall
     if (bottomwallcollision(h))==1 % Detects collision with bottom wall and pushes us up
-        fprintf('bottomwall\n')
+        
         h.YData=h.YData+.5;
         vector.YData = vector.YData + 5; 
     end
     if (topwallcollision(h))==1 % detects collision with top wall and pushes us down
-        fprintf('topwall\n')
+        
         h.YData=h.YData-.5;
         vector.YData = vector.YData-5; 
     end
