@@ -51,22 +51,29 @@ laser.UserData.vy = 0;
 laser.UserData.dead=0;
 
 %% Add bad guys
+%% random enemies 
 badguyok = 0;
-i=0;
-    while (i<=10)
+i=1;
+hbadguys = [];
+    while (i<=30)
   b = randi(3000,1)
-  c = randi(150,1)
-  hbadguy = fill([b,b,b+20,b+20,b],[c,c+10,c+10,c,c],'g')
-  if (topwallcollision(hbadguy)==1 || bottomwallcollision(hbadguy)==1)
+  c = randi(301,1)-150
+  hbadguy = fill([b,b,b+20,b+20,b],[c,c+20,c+20,c,c],'g')
+  pause(0.01); 
+   if (topwallcollision(hbadguy) || bottomwallcollision(hbadguy))
       disp('bad badguy - make a new one');
       badguyok = 0;
-      clear hbadguy
-  else 
+      %clear hbadguy
+      delete([hbadguy]);
+      pause(0.01); 
+   else 
+      disp('good badguy'); 
       badguyok = 1;
+      hbadguys=[hbadguys hbadguy]; 
       i = i+1
   end 
     end
-    
+  
 %% Plot Motion
 flushinput(s);
 v=1;
@@ -96,10 +103,19 @@ while(1)
         vector.Visible='on';
     end
     
+    for j=1:30
+        if (isCollision(laser,hbadguys(j)))
+            fprintf('Hit!');
+        end
+    end
+    
+%     if (badguycollision(laser)==1)
+%         fprintf('collison');
+%     end
     %% fire laser
     if input == 65527 % bug somewhere in this section
         fprintf('shoot\n');
-        laser.XData = [20 22] + mean(h.XData)
+        laser.XData = [0 0] + mean(h.XData)
         laser.YData = [0 0] + mean(h.YData)
         laser.UserData.vx = laser.UserData.v*cos(vector.UserData.theta)
         laser.UserData.vy = laser.UserData.v*sin(vector.UserData.theta)
@@ -116,7 +132,9 @@ while(1)
             end
             if (bottomwallcollision(laser))==1 || (topwallcollision(laser)==1)
                 laser.UserData.dead = 0;
+                laser.Visible = 'off';
             end
+            
         end
     
     %% moving object
