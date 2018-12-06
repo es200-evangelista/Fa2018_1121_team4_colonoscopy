@@ -40,8 +40,8 @@ vector.YData = vector.YData+mean(h.YData);
 
 %% Make Lasers
 
-laserx=[20 22];
-lasery=[0 0];
+laserx=[20 30 30 20 20];
+lasery=[0 0 10 10 0];
 laser = plot(laserx, lasery, 'o');
 laser.UserData.l=2;
 laser.Visible = 'off';
@@ -55,7 +55,7 @@ laser.UserData.dead=0;
 badguyok = 0;
 i=1;
 hbadguys = [];
-    while (i<=30)
+    while (i<=10)
   b = randi(3000,1)
   c = randi(301,1)-150
   hbadguy = fill([b,b,b+20,b+20,b],[c,c+20,c+20,c,c],'g')
@@ -103,9 +103,9 @@ while(1)
         vector.Visible='on';
     end
     
-    for j=1:30
-        if (isCollision(laser,hbadguys(j)))
-            fprintf('Hit!');
+    for j=1:10
+        if (isCollision2(laser,hbadguys(j)))
+            fprintf('Hit!')
         end
     end
     
@@ -115,10 +115,10 @@ while(1)
     %% fire laser
     if input == 65527 % bug somewhere in this section
         fprintf('shoot\n');
-        laser.XData = [0 0] + mean(h.XData)
-        laser.YData = [0 0] + mean(h.YData)
-        laser.UserData.vx = laser.UserData.v*cos(vector.UserData.theta)
-        laser.UserData.vy = laser.UserData.v*sin(vector.UserData.theta)
+        laser.XData = [0 2 2 0 0] + mean(h.XData);
+        laser.YData = [0 0 2 2 0] + mean(h.YData);
+        laser.UserData.vx = laser.UserData.v*cos(vector.UserData.theta);
+        laser.UserData.vy = laser.UserData.v*sin(vector.UserData.theta);
         laser.Visible= 'on';
         laser.UserData.dead = 1;
     end
